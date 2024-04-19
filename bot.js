@@ -1,5 +1,5 @@
-const { Client, LocalAuth } = require("whatsapp-web.js");
-//const { insertarContactos } = require("./lib/connection_db");
+const { Client, LocalAuth, NoAuth } = require("whatsapp-web.js");
+const { insertarContactos } = require("./lib/connection_db");
 const qrcode = require("qrcode-terminal");
 const fs = require("fs");
 const path = require("path");
@@ -20,52 +20,35 @@ client.once("ready", () => {
     .getContacts()
     .then((listContact) => {
       // Filtrar las propiedades necesarias y mapear los objetos a un nuevo formato
-      const contactosFiltrados = listContact
-        .map((contacto) => {
-          if (
-            contacto.isMyContact == false ||
-            contacto.isUser == false ||
-            contacto.number == undefined ||
-            contacto.name == undefined ||
-            contacto.number == null ||
-            contacto.name == null
-          ) {
-            console.log(
-              "Los grupos y los contactos raros No sera agregados a la db"
-            );
-
-            return undefined;
-          } else {
-            return {
-              wid: contacto.id._serialized,
-              nombre: contacto.name,
-              shortName: contacto.shortName,
-              w_number_tlf: contacto.number,
-            };
-          }
-        })
-        .filter((contacto) => contacto !== null); // Filtra los elementos null
+      const contactosFiltrados = [];
+      listContact.forEach((contacto) => {
+        if (
+          contacto.isMyContact == false ||
+          contacto.isUser == false ||
+          contacto.number == undefined ||
+          contacto.name == undefined ||
+          contacto.number == null ||
+          contacto.name == null ||
+          contacto == null
+        ) {
+          console.log("Estos contactos no son clientes");
+        } else {
+          contactosFiltrados.push({
+            wid: contacto.id._serialized,
+            nombre: contacto.name,
+            w_number_tlf: contacto.number,
+            pushName: contacto.pushname,
+          });
+        }
+      });
       // Ahora mandamos estos registros a la base de datos, a la tabla de clientes
       console.log("Cargando contactos a la db...");
-
-      fs.writeFile(
-        "contactos.json",
-        JSON.stringify(contactosFiltrados),
-        (err) => {
-          if (err) {
-            console.log("Error al generar el archivo");
-          } else {
-            console.log("Registro exportado con exito");
-          }
-        }
-      );
-
-      return 1;
 
       insertarContactos(contactosFiltrados)
         .then((exito) => {
           if (exito) {
             console.log("Los contactos se han insertado correctamente.");
+            // mandamos al menu de opciones
           } else {
             console.log("Hubo un error al insertar los contactos.");
           }
