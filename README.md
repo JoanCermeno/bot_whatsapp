@@ -1,6 +1,6 @@
 # WhatsApp Business Notifications System by Joan Cermeño 😁💥
 
-This is a system for sending periodic notifications to businesses using WhatsApp. It leverages the `whatsapp-web.js` library to automate responses.
+This is a system for sending periodic notifications to clients using WhatsApp. It leverages the `whatsapp-web.js` library to automate responses.
 
 ## Features
 
