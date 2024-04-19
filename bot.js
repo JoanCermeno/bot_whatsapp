@@ -1,8 +1,9 @@
 const { Client, LocalAuth } = require("whatsapp-web.js");
+//const { insertarContactos } = require("./lib/connection_db");
 const qrcode = require("qrcode-terminal");
 const fs = require("fs");
 const path = require("path");
-// Create a new client instance
+
 const client = new Client({
   webVersionCache: {
     type: "remote",
@@ -12,66 +13,68 @@ const client = new Client({
   authStrategy: new LocalAuth(),
 });
 
-// When the client is ready, run this code (only once)
 client.once("ready", () => {
-  console.log("Client is ready!");
+  console.log("conetion readdy!");
+  // obteniendo una lista copleta de los contactos del cliente conectado con el metodo getContact
+  client
+    .getContacts()
+    .then((listContact) => {
+      // Filtrar las propiedades necesarias y mapear los objetos a un nuevo formato
+      const contactosFiltrados = listContact
+        .map((contacto) => {
+          if (
+            contacto.isMyContact == false ||
+            contacto.isUser == false ||
+            contacto.number == undefined ||
+            contacto.name == undefined ||
+            contacto.number == null ||
+            contacto.name == null
+          ) {
+            console.log(
+              "Los grupos y los contactos raros No sera agregados a la db"
+            );
 
-  // si el json con los contactos no existe lo generamos
-
-  const nombreArchivo = "contactos.json"; // Nombre del archivo que quieres verificar
-
-  // Obtener la ruta absoluta del archivo
-  const rutaArchivo = path.join(__dirname, nombreArchivo);
-
-  // Verificar si el archivo existe
-  fs.access(rutaArchivo, fs.constants.F_OK, (err) => {
-    if (err) {
-      console.error(`El archivo ${nombreArchivo} no existe.`);
-      // obteniendo una lista copleta de mis contactos
-      client
-        .getContacts()
-        .then((listContact) => {
-          // Create file whit all contacts
-          const contactosFormateados = listContact.map((contact) => {
-            if (contact.isUser == true) {
-              let contacto_reducido = {
-                id: contact.id,
-                numero: contact.number,
-                name: contact.name,
-                pushname: contact.pushname,
-                shorname: contact.shortName,
-                isUser: contact.isUser,
-              };
-
-              return contacto_reducido;
-            } else {
-              console.log(
-                "Se detecto un grupo, no se agrego a la lista de contacto"
-              );
-            }
-          });
-
-          fs.writeFile(
-            "contactos.json",
-            JSON.stringify(contactosFormateados),
-            (err) => {
-              if (err) {
-                console.log(err);
-              } else {
-                console.log("Contactos, creados y exportados");
-                // mandamos a llamar a la conexion de la base de datos
-                require("./lib/connection_db");
-              }
-            }
-          );
+            return undefined;
+          } else {
+            return {
+              wid: contacto.id._serialized,
+              nombre: contacto.name,
+              shortName: contacto.shortName,
+              w_number_tlf: contacto.number,
+            };
+          }
         })
-        .catch((err) => err);
-    } else {
-      console.log(`El archivo ${nombreArchivo} existe.`);
-      //Pasamos a conectar con la base de datos... para ingresar los numeros de telefono
-      require("./lib/connection_db");
-    }
-  });
+        .filter((contacto) => contacto !== null); // Filtra los elementos null
+      // Ahora mandamos estos registros a la base de datos, a la tabla de clientes
+      console.log("Cargando contactos a la db...");
+
+      fs.writeFile(
+        "contactos.json",
+        JSON.stringify(contactosFiltrados),
+        (err) => {
+          if (err) {
+            console.log("Error al generar el archivo");
+          } else {
+            console.log("Registro exportado con exito");
+          }
+        }
+      );
+
+      return 1;
+
+      insertarContactos(contactosFiltrados)
+        .then((exito) => {
+          if (exito) {
+            console.log("Los contactos se han insertado correctamente.");
+          } else {
+            console.log("Hubo un error al insertar los contactos.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error al insertar contactos:", error);
+        });
+    })
+    .catch((err) => console.log(err));
 });
 
 // When the client received QR-Code
@@ -80,7 +83,6 @@ client.on("qr", (qr) => {
   qrcode.generate(qr, { small: true });
 });
 
-// Start your client
 client.initialize();
 
 module.exports = client;
