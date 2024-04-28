@@ -3,3 +3,4 @@
 /.wwebjs_cache
 /contactos.json
 /node_modules
+/migrations/clientes_mock.sql
