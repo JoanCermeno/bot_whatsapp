@@ -1,6 +1,6 @@
 # WhatsApp Business Notifications System by Joan Cermeño 😁💥
 
-This is a system for sending periodic notifications to clients using WhatsApp. It leverages the `whatsapp-web.js` library to automate responses.
+This is a system for sending periodic notifications to clients using WhatsApp. It leverages the `whatsapp-web.js` library to remenber
 
 ## Features
 
@@ -20,10 +20,10 @@ This is a system for sending periodic notifications to clients using WhatsApp. I
 3. Run the application with `npm start`.
 4. Scan the QR code whit your phone
 5. Manage client data and notification schedules from the following address. localhost/wbnsjc coming soon
+
 ## Usage
 
-- Customize your messages and scheduling in `config.js`.
-- Run the application to start sending notifications automatically.
+    proximamente estamos crudos....
 
 ## License
 

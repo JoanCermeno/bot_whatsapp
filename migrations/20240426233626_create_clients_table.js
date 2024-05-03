@@ -20,7 +20,9 @@ exports.up = function (knex) {
     table
       .string("w_number_tlf", 100)
       .nullable()
-      .comment("Número de teléfono del WhatsApp");
+      .comment("Número de teléfono del WhatsApp")
+      .unique();
+
     table
       .date("fecha_contratacion")
       .nullable()

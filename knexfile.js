@@ -1,3 +1,6 @@
+const { attachPaginate } = require("knex-paginate"); //Un sistema propio de knex para paginaciones
+attachPaginate();
+
 require("dotenv").config();
 
 const dev = {

@@ -7,8 +7,10 @@ router.get("/", apiDoc.welcome);
 
 // Rutas para los clientes
 router.get("/clientes", clienteController.getAllClientes);
+router.get("/clientes-activos", clienteController.getClientesActivos);
 router.get("/clientes/:id", clienteController.getClienteById);
 router.post("/clientes", clienteController.createCliente);
+router.put("/clientes", clienteController.updateProximoPagoDiasRestantes);
 router.put("/clientes/:id", clienteController.updateCliente);
 router.delete("/clientes/:id", clienteController.deleteCliente);
 
