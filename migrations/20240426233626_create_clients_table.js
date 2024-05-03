@@ -49,6 +49,12 @@ exports.up = function (knex) {
       .comment(
         "Este campo determina si el cliente tiene una una mensaalidad o susbcrition activa"
       );
+    table
+      .boolean("eliminado")
+      .defaultTo(0)
+      .comment(
+        "Con esto determinaoms si el cliente fue eliminado por el usuario"
+      );
   });
 };
 

@@ -1,4 +1,5 @@
 // Importa el modelo del cliente si es necesario
+const { error } = require("qrcode-terminal");
 const { client } = require("../../knexfile");
 const Cliente = require("../models/Cliente");
 
@@ -128,7 +129,10 @@ const clienteController = {
     );
 
     const clienteToUpdate = Object.fromEntries(camposFiltrados);
+
     const { numero } = clienteToUpdate;
+    const { fecha_contratacion } = clienteToUpdate;
+
     //validando el formato del numero de telefono
     if (typeof numero == "string") {
       if (numero.length == 11) {
@@ -147,26 +151,62 @@ const clienteController = {
     }
     console.log(typeof numero);
 
-    console.log(clienteToUpdate);
-    return 1;
-    try {
-      const clienteActualizado = await Cliente.actualizar(
-        id,
-        nombre,
-        numero,
-        fecha_contratacion
-      );
+    //comrpobando que fecha no sea una fecha superior a la actual.
+    const fechaActual = new Date();
+    const fechaDada = new Date(fecha_contratacion);
+    if (fechaDada > fechaActual) {
+      //si fecha de contratacion es mayor a la fecha actual disparamos un error
+      return res.status(400).send({
+        message:
+          "No no puedes establecer una fecha futura para el pago del cliente",
+        error: true,
+      });
+    }
 
-      res.status(200).send({ clienteActualizado });
+    console.log(clienteToUpdate);
+
+    try {
+      const clienteActualizado = await Cliente.actualizar(clienteToUpdate, id);
+
+      if (clienteActualizado != 0) {
+        res
+          .status(200)
+          .send({ message: "actualizado con exito", clienteActualizado });
+      } else {
+        res.status(400).send({
+          message: "Ese id de cliente no existe...",
+          clienteActualizado,
+        });
+      }
     } catch (error) {
       console.log(error);
       return error;
     }
   },
 
-  deleteCliente: (req, res) => {
+  deleteCliente: async (req, res) => {
     // Lógica para eliminar un cliente
-    res.send(`Eliminar cliente con ID ${req.params.id}`);
+    const { id } = req.params;
+
+    try {
+      const result = await Cliente.deleteCliente(id);
+
+      console.log(result);
+      if (result == 1) {
+        return res.status(200).send({
+          error: false,
+          message: `Cliente con id ${id} Eliminado correctamente`,
+        });
+      } else {
+        return res.status(400).send({
+          error: true,
+          message: `Cliente con id ${id} No se pudo eliminar`,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   },
 };
 

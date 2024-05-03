@@ -3,10 +3,13 @@ const { knex } = require("../../lib/connection_db");
 
 // Función para obtener todos los clientes
 async function obtenerClientes(page, perPage, nombre) {
-  let Query = knex("clientes").select("*").paginate({
-    perPage: perPage,
-    currentPage: page,
-  });
+  let Query = knex("clientes")
+    .select("*")
+    .where("eliminado", "!=", "1")
+    .paginate({
+      perPage: perPage,
+      currentPage: page,
+    });
 
   if (nombre != null || nombre != undefined) {
     Query = knex("clientes")
@@ -122,29 +125,32 @@ async function crearCliente(nombre, numero, fecha_contratacion) {
   }
 }
 
-async function actualizar(id, nombre, numero, fecha_contratacion) {
+async function actualizar(clienteToUpdate, id) {
   try {
-    let wid = numero + "@c.us";
-    let clienteToUpdate = {
-      wid: wid,
-      nombre: nombre,
-      w_number_tlf: numero,
-      fecha_contratacion: fecha_contratacion,
-    };
-
     //console.log(clienteToUpdate);
     //si la query falla deberia saltar al aerror
-
     const resultQuery = await knex("clientes")
       .where("id", id)
       .update(clienteToUpdate);
 
+    console.log(resultQuery);
     if (resultQuery == 1) {
       //Si la actualizacion tuvo exito automaticamente actualizamos todos los datos de los clientes. refrescamos de forma global
       await actualizarDatosClientes();
+      return id;
     }
+    return resultQuery;
+  } catch (error) {
+    throw error;
+  }
+}
 
-    return clienteToUpdate;
+async function deleteCliente(id) {
+  try {
+    const deleteCliente = await knex("clientes")
+      .where("id", "=", id)
+      .update({ eliminado: true });
+    return deleteCliente;
   } catch (error) {
     throw error;
   }
@@ -157,4 +163,5 @@ module.exports = {
   obtenerClientesActivos,
   crearCliente,
   actualizar,
+  deleteCliente,
 };
