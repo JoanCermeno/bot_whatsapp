@@ -1,6 +1,6 @@
 const apiDocumentacion = {
   welcome: (req, res) => {
-    res.send("Welcome to my  api");
+    res.send("This is the documentacion of de /enponits");
   },
 };
 

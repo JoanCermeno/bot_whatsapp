@@ -19,11 +19,7 @@ This is a system for sending periodic notifications to clients using WhatsApp. I
 2. Install dependencies using `npm install`.
 3. Run the application with `npm start`.
 4. Scan the QR code whit your phone
-5. Manage client data and notification schedules from the following address. localhost/wbnsjc coming soon
-
-## Usage
-
-    proximamente estamos crudos....
+5. now you are readdy, make a get /clientes ✨
 
 ## License
 
