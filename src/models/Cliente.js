@@ -102,6 +102,30 @@ async function obtenerClientesActivos() {
   }
 }
 
+async function obtenerClientesInactivos() {
+  try {
+    /*Funcion para obtener solo los clientes inactivos*/
+    const clientesActivos = await knex("clientes")
+      .where("cliente_activo", 0)
+      .select("*");
+    return clientesActivos;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function obtenerClientesConDeudas() {
+  try {
+    /*Funcion para obtener solo los clientes Que deben o tienen dias de retraso*/
+    const clientesConDeudas = await knex("clientes")
+      .where("dias_restante", "<=", 0)
+      .select("*");
+    return clientesConDeudas;
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function crearCliente(nombre, numero, fecha_contratacion) {
   /** Funcion para insertar un nuevo cliente en la base de datos
    * Ojo existe un campo que se llama wid Que es el identifacor que le da
@@ -164,4 +188,6 @@ module.exports = {
   crearCliente,
   actualizar,
   deleteCliente,
+  obtenerClientesInactivos,
+  obtenerClientesConDeudas,
 };

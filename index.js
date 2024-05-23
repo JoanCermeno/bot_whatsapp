@@ -6,6 +6,9 @@ const port = process.env.PORT || 6969;
 const validJson = require("./src/middleware/errorHandler");
 require("dotenv").config();
 const cors = require("cors");
+const path = require("path");
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use(
   //Solo respondo peticiones provenientes de origin
   cors({

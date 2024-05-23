@@ -59,16 +59,16 @@ exports.up = function (knex) {
     })
     .createTable("recordatorios", function (table) {
       table.increments("id");
-      table.timestamp("fecha").notNullable();
+      table.timestamp("fecha").notNullable().defaultTo(knex.fn.now());
       table.integer("mensaje_template_id").notNullable();
       table.integer("enviado_cliente_id");
       table.text("mensaje");
-      table.tinyint("eliminado");
+      table.tinyint("eliminado").notNullable().defaultTo(0);
     })
     .createTable("template_mensaje", function (table) {
       table.increments("id");
-      table.timestamp("created_ad");
-      table.string("body");
+      table.timestamp("created_ad").notNullable().defaultTo(knex.fn.now());
+      table.text("body");
       table.string("description");
     })
     .createTable("cliente_mensaje_config", function (table) {

@@ -48,3 +48,7 @@ insert into `clientes` (`proximo_pago`, `fecha_contratacion`, `id`, `nombre`, `p
 insert into `clientes` (`proximo_pago`, `fecha_contratacion`, `id`, `nombre`, `pushName`, `w_number_tlf`, `wid`) values (NULL, NULL, 1569, 'Juan Carlo', NULL, '584245199289', '584245199289@c.us');
 insert into `clientes` (`proximo_pago`, `fecha_contratacion`, `id`, `nombre`, `pushName`, `w_number_tlf`, `wid`) values (NULL, NULL, 1570, 'Juan Gomez', NULL, '584143392527', '584143392527@c.us');
 insert into `clientes` (`proximo_pago`, `fecha_contratacion`, `id`, `nombre`, `pushName`, `w_number_tlf`, `wid`) values (NULL, NULL, 1573, 'Lentes', NULL, '584247219447', '584247219447@c.us');
+-- insertar mensajes por defecto que se enviara como recordatorio a cada cliente
+insert into `template_mensaje` (`body` , `description` ) values (' Hola @nombre, Esperamos que estés disfrutando de nuestros servicios de internet. Nos gustaría recordarte que tu próximo pago está por vencer en @dias días. Esperamos que tena un feliz dia y que pudea seguir disfrutando de nuestros servicios sin interrupciones. Recuerde su fecha de vencimientos es @proximo_pago Si tienes alguna pregunta o necesitas asistencia para realizar tu pago, no dudes en contactarnos. Podemos ayudarte a encontrar la mejor opción de pago para ti.
+Gracias por tu preferencia y cooperación.
+Saludos cordiales' , 'Mensaje por defecto')

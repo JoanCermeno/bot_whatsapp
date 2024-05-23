@@ -4,7 +4,7 @@ const Recordatorio = require("./../models/Recordatorio");
 const recordatorio = {
   getRecordatorios: async (req, res) => {
     //Logica para mostrar todos los recordatorios enviados.
-    console.log("Se activo el recordatorio!np");
+    console.log("Se activo el recordatorio");
 
     try {
       const recordatorios = await Recordatorio.obtenerRecordatorios();

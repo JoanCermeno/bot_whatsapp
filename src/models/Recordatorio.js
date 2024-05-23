@@ -7,7 +7,7 @@ const moment = require("moment");
 async function obtenerRecordatorios(page, perPage, nombre) {
   let Query = knex("recordatorios")
     .select("*")
-    .where("eliminado", "!=", "1")
+    .where("eliminado", "!=", "1", "or", "eliminado", "!=", "NULL")
     .paginate({
       perPage: perPage,
       currentPage: page,
@@ -95,6 +95,7 @@ async function insertar(id_cliente) {
     return guardarRecordatorio;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 }
 

@@ -5,7 +5,7 @@ const Cliente = require("../models/Cliente");
 
 // Controlador para manejar las solicitudes relacionadas con los clientes
 const clienteController = {
-  getAllClientes: async (req, res) => {
+  getAllContactos: async (req, res) => {
     // Mandamos a llamar a todos los clientes de la db
     const page = parseInt(req.query.page || 1);
     const perPage = parseInt(req.query.perPage || 10);
@@ -41,6 +41,44 @@ const clienteController = {
       res.send({
         message:
           "Pija algo salio mal, no te preocupes que no es tu culpa, la culpa es de la vaca",
+      });
+    }
+  },
+  getClientesInactivos: async (req, res) => {
+    try {
+      // Mandamos a llamar a todos los clientes que estan inactivos o nunan han ha contratado el servicio.
+      const page = parseInt(req.query.page || 1);
+      const perPage = parseInt(req.query.perPage || 10);
+      const clientesInactivos = await Cliente.obtenerClientesInactivos(
+        page,
+        perPage
+      );
+      res.send(clientesInactivos);
+    } catch (error) {
+      console.log(error);
+      res.send({
+        error: true,
+        message: "Ocurrio un error al intentar buscar a los clientes inactivos",
+      });
+    }
+  },
+  getClientesConDeudas: async (req, res) => {
+    /*Devolver clientes con dias de atraso o deudas de servicios*/
+    try {
+      // Mandamos a llamar a todos los clientes que estan vencidos o tienen deudas pendientes
+      const page = parseInt(req.query.page || 1);
+      const perPage = parseInt(req.query.perPage || 10);
+      const clientesConDeudas = await Cliente.obtenerClientesConDeudas(
+        page,
+        perPage
+      );
+      res.send(clientesConDeudas);
+    } catch (error) {
+      console.log(error);
+      res.send({
+        error: true,
+        message:
+          "Ocurrio un error al intentar buscar a los Con deundas pendientes",
       });
     }
   },
