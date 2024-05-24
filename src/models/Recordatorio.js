@@ -1,7 +1,7 @@
 const { Knex } = require("knex");
 const { knex } = require("../../lib/connection_db");
 const moment = require("moment");
-//const api_whatasapp = require("./../controllers/api_whatsapp");
+const api_whatasapp = require("./../controllers/api_whatsapp");
 
 // Función para obtener todos los recordatorios
 async function obtenerRecordatorios(page, perPage, nombre) {

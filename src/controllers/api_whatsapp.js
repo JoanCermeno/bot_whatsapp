@@ -15,16 +15,21 @@ const client = new Client({
   authStrategy: new LocalAuth(),
 });
 
-let qrCodeData = ""; // Variable para almacenar el QR code temporalmente
+// Función modificada para manejar la respuesta del servidor
+const login = (req, res) => {
+  res.send({
+    message: "Obten tu codigo QR por medio de la siguiente ruta.",
+    wsUrl: `ws://localhost:${puerto}`,
+  });
+};
 
 wss.on("connection", (socket) => {
-  console.log("Cliente conectado");
-  socket.send("En breve te enviaremos el qr de autenticacion");
+  console.log("Cliente solicitando el codigo qr...");
+  socket.send("Su codigo qr sera generado en breve, por favor espere.");
 
   client.on("qr", (qr) => {
-    qrCodeData = qr.toString();
-    console.log("QR RECEIVED ", qrCodeData); // Opcional: Imprime el QR para depuración
-    socket.send(qrCodeData);
+    console.log("QR GENERADO! -> ", qr); // Opcional: Imprime el QR para depuración
+    socket.send(qr.toString());
   });
 
   socket.on("close", () => {
@@ -34,23 +39,15 @@ wss.on("connection", (socket) => {
   socket.onerror = function () {
     console.log("Ocurrió un error");
   };
+
+  socket.onmessage = function () {
+    console.log("Me enviaron algo");
+  };
 });
 
 client.once("ready", () => {
   console.log("conetion con el whastapp del cliente establecida!!");
 });
-
-// Función modificada para manejar la respuesta del servidor
-const login = (req, res) => {
-  if (qrCodeData != "") {
-    res.send({
-      message: "Obten tu codigo QR por medio de la siguiente ruta.",
-      wsUrl: `ws://localhost:${pory}`,
-    });
-  } else {
-    res.status(102).send({ mensaje: `The QR is empty... Try again later` });
-  }
-};
 
 client.initialize();
 
