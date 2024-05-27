@@ -1,7 +1,8 @@
 const { Client, LocalAuth } = require("whatsapp-web.js");
-const qrcode = require("qrcode-terminal");
 const WebSocket = require("ws");
+const fs = require("fs").promises;
 const puerto = process.env.WSPORT || 8081;
+let sessionIniciada = false;
 
 // Crear un nuevo servidor WebSocket para poder enviar el qr automaticamente
 const wss = new WebSocket.Server({ port: puerto });
@@ -15,20 +16,12 @@ const client = new Client({
   authStrategy: new LocalAuth(),
 });
 
-// Función modificada para manejar la respuesta del servidor
-const login = (req, res) => {
-  res.send({
-    message: "Obten tu codigo QR por medio de la siguiente ruta.",
-    wsUrl: `ws://localhost:${puerto}`,
-  });
-};
-
 wss.on("connection", (socket) => {
   console.log("Cliente solicitando el codigo qr...");
-  socket.send("Su codigo qr sera generado en breve, por favor espere.");
 
   client.on("qr", (qr) => {
-    console.log("QR GENERADO! -> ", qr); // Opcional: Imprime el QR para depuración
+    console.log("QR GENERADO! -> ", qr);
+    //enviamos el codigo qr al cliente
     socket.send(qr.toString());
   });
 
@@ -40,14 +33,47 @@ wss.on("connection", (socket) => {
     console.log("Ocurrió un error");
   };
 
-  socket.onmessage = function () {
-    console.log("Me enviaron algo");
-  };
+  //Si el evento ready ocurre mandamos el objeto de incio de session
+  client.once("ready", () => {
+    console.log("conetion con el whastapp del cliente establecida!!");
+    //enviamos un objeto de identifiacion de logeo.
+    //modificamos la variable golbal
+    sessionIniciada = {
+      login: true,
+    };
+    const dataToSend = JSON.stringify(sessionIniciada);
+    socket.send(dataToSend);
+    console.log("Se envio el objeto de session");
+  });
 });
 
-client.once("ready", () => {
-  console.log("conetion con el whastapp del cliente establecida!!");
-});
+//funcion para comprobar que existe una session iniciada whatsaapWebJs
+
+async function wwebjsIsset() {
+  // el objetivo de esta funcion es ver si la carpeta .wwwebjs_auth/session existe y reportar
+  try {
+    await fs.access("./.wwebjs_auth");
+    console.log("1"); // La carpeta existe
+    return 1;
+  } catch {
+    console.log("0"); // La carpeta no existe
+    return 0;
+  }
+}
+
+// Función modificada para manejar la respuesta del servidor
+const login = async (req, res) => {
+  //comprobar si existe una session iniciada
+  sessionIniciada = await wwebjsIsset();
+  if (sessionIniciada) {
+    //tiene un objeto, lo enviamos al cliente
+    res.send({
+      login: true,
+    });
+  } else {
+    res.send({ mensaje: "por favor espere a que se genere su codigo qr" });
+  }
+};
 
 client.initialize();
 
